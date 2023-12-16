@@ -1,0 +1,75 @@
+<template>
+    <lightning-card  >
+
+        <lightning-button if:true={ListMessage} variant="border-filled"
+            label="Chat with customer" onclick={handleOtherChat} slot="actions">
+        </lightning-button>
+
+        <lightning-spinner alternative-text="Loading" size="small" if:true={isSpinner}></lightning-spinner>
+        <div class="slds-p-horizontal_small">
+
+            <section class="slds-chat" if:false={ListMessage}>
+                <lightning-input type="tel" required variant="label-hidden" name="Phone" onchange={handlePhoneChange} placeholder="Enter Customer Phone Number">
+                </lightning-input>
+                <br/>
+                <lightning-button variant="brand" label="Chat with Customer" title="Chat with Customer" onclick={handlelistAllMessageByCustomer}></lightning-button>
+            </section>
+
+            <section role="log" class="messageContent slds-chat slds-scrollable" if:true={ListMessage} style="height: 350px;">
+                <ul class="slds-chat-list">
+                    <template if:true={ListMessage} for:each={ListMessage} for:item="message" for:index="index">
+                            <!-- Message From Customer -->
+                        <li class="slds-chat-listitem slds-chat-listitem_inbound" key={message.Id} if:false={message.Outgoing__c}>
+                            <div class="slds-chat-message" if:true={message.MessageContent__c}>
+                                <span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                                    <abbr class="slds-avatar__initials slds-avatar__initials_inverse" title={message.CustomerName__c}>AM</abbr>
+                                </span>
+                                <div class="slds-chat-message__body">
+                                    <div class="slds-chat-message__text slds-chat-message__text_inbound">
+                                        <span>
+                                            <lightning-formatted-rich-text value={message.MessageContent__c}></lightning-formatted-rich-text>
+                                        </span>
+                                    </div>
+                                    <div class="slds-chat-message__meta" aria-label={message.areaLabel}>{message.CustomerName__c} • <lightning-formatted-date-time value={message.CreatedDate} hour="2-digit"></lightning-formatted-date-time></div>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- Message From Salesforce -->
+                        <li class="slds-chat-listitem slds-chat-listitem_outbound" key={message.Id} if:true={message.Outgoing__c}>
+                            <div class="slds-chat-message" if:true={message.MessageContent__c}>
+                                <!-- <span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                                    <abbr class="slds-avatar__initials slds-avatar__initials_inverse" title={message.AgentName__c}>AM</abbr>
+                                </span> -->
+                                <div class="slds-chat-message__body">
+                                    <div class="slds-chat-message__text slds-chat-message__text_outbound">
+                                        <span>
+                                            <lightning-formatted-rich-text value={message.MessageContent__c}></lightning-formatted-rich-text>
+                                        </span>
+                                    </div>
+                                    <div class="slds-chat-message__meta" aria-label={message.areaLabel}>{message.AgentName__c} • <lightning-formatted-date-time value={message.CreatedDate} hour="2-digit"></lightning-formatted-date-time></div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </section>
+            <div if:true={chatEnabled}>
+                <span class="slds-icon_container slds-icon-utility-end_chat slds-chat-icon">
+                    <svg class="slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                    <use xlink:href="/apexpages/slds/latest/assets/icons/utility-sprite/svg/symbols.svg#chat"></use>
+                    </svg>
+                </span>
+                <p>
+                    <lightning-button-icon onclick={handleSendMessage} class="btnIconOverlay" icon-name="utility:send">
+                    </lightning-button-icon>
+                    <lightning-input message-when-value-missing="Please type a valid messgae before sending it"
+                        required value={chatMessage} type="text" class="chat-input"
+                        variant="label-hidden" onchange={handleChatChange} name="Message"
+                        placeholder="type here...">
+                    </lightning-input>
+                </p>
+            </div>
+        </div>
+        
+    </lightning-card>
+</template>
